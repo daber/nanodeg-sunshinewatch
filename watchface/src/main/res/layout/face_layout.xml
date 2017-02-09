@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:gravity="center"
+              android:background="@color/blue"
+>
+
+
+  <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:id="@+id/time_view"
+            android:text="15:50:20"
+            android:textSize="40dp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+  />
+
+  <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:id="@+id/date_view"
+            android:text="Fri,08 Feb 2017"
+            android:textSize="25dp"
+            android:textColor="@color/white"
+
+  />
+
+  <View android:layout_width="50dp" android:layout_height="2dp"
+        android:background="@color/white"
+
+
+  />
+
+  <LinearLayout android:layout_width="wrap_content" android:layout_height="40dp"
+                android:orientation="horizontal"
+  >
+
+    <ImageView android:layout_width="40dp" android:layout_height="40dp"
+               android:id="@+id/weather_icon_view"
+               android:src="@drawable/art_clear"
+
+
+    />
+
+    <TextView android:layout_width="wrap_content" android:layout_height="match_parent"
+              android:id="@+id/maxtemp_view"
+              android:text="20 \u00b0"
+              android:textSize="25dp"
+              android:textColor="@color/white"
+              android:gravity="center"
+              android:textStyle="bold"
+
+    />
+    <TextView android:layout_width="wrap_content" android:layout_height="match_parent"
+              android:layout_marginLeft="20dp"
+              android:id="@+id/mintemp_view"
+              android:text="20 \u00b0"
+              android:textSize="25dp"
+              android:textColor="@color/white"
+              android:gravity="center"
+
+
+    />
+  </LinearLayout>
+
+
+</LinearLayout>
