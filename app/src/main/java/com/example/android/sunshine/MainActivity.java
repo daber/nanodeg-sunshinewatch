@@ -79,6 +79,11 @@ public class MainActivity extends AppCompatActivity implements
 
     private ProgressBar mLoadingIndicator;
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SunshineSyncUtils.startImmediateSync(this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

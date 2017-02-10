@@ -18,17 +18,28 @@ package com.example.android.sunshine.sync;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
+import android.util.Log;
 
 import com.example.android.sunshine.data.SunshinePreferences;
 import com.example.android.sunshine.data.WeatherContract;
 import com.example.android.sunshine.utilities.NetworkUtils;
 import com.example.android.sunshine.utilities.NotificationUtils;
 import com.example.android.sunshine.utilities.OpenWeatherJsonUtils;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResolvingResultCallbacks;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
 
 import java.net.URL;
 
 public class SunshineSyncTask {
+    public static String weather = "/weather";
 
     /**
      * Performs the network request for updated weather, parses the JSON from that request, and
@@ -36,9 +47,10 @@ public class SunshineSyncTask {
      * weather has been loaded if the user hasn't been notified of the weather within the last day
      * AND they haven't disabled notifications in the preferences screen.
      *
-     * @param context Used to access utility methods and the ContentResolver
+     * @param context      Used to access utility methods and the ContentResolver
+     * @param googleClient
      */
-    synchronized public static void syncWeather(Context context) {
+    synchronized public static void syncWeather(Context context, GoogleApiClient googleClient) {
 
         try {
             /*
@@ -54,6 +66,21 @@ public class SunshineSyncTask {
             /* Parse the JSON into a list of weather values */
             ContentValues[] weatherValues = OpenWeatherJsonUtils
                     .getWeatherContentValuesFromJson(context, jsonWeatherResponse);
+
+            PutDataMapRequest request = PutDataMapRequest.create(weather);
+            DataMap map = request.getDataMap();
+
+            if (googleClient.isConnected() && weatherValues != null && weatherValues.length > 0) {
+                map.putInt("icon", weatherValues[0].getAsInteger(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID));
+                map.putFloat("max", weatherValues[0].getAsFloat(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP));
+                map.putFloat("min", weatherValues[0].getAsFloat(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP));
+                map.putLong("ts",System.currentTimeMillis());
+
+                PutDataRequest dataRequest = request.asPutDataRequest();
+                dataRequest.setUrgent();
+                DataApi.DataItemResult result = Wearable.DataApi.putDataItem(googleClient, dataRequest).await();
+                Log.d("DataItem",result.getStatus().toString());
+            }
 
             /*
              * In cases where our JSON contained an error code, getWeatherContentValuesFromJson

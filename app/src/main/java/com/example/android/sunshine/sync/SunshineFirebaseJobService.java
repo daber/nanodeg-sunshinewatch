@@ -17,21 +17,28 @@ package com.example.android.sunshine.sync;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.firebase.jobdispatcher.Job;
 import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;
 import com.firebase.jobdispatcher.RetryStrategy;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.Wearable;
 
 
-public class SunshineFirebaseJobService extends JobService {
+public class SunshineFirebaseJobService extends JobService implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private AsyncTask<Void, Void, Void> mFetchWeatherTask;
+    private GoogleApiClient googleClient;
 
     /**
      * The entry point to your Job. Implementations should offload work to another thread of
      * execution as soon as possible.
-     *
+     * <p>
      * This is called by the Job Dispatcher to tell us we should start our job. Keep in mind this
      * method is run on the application's main thread, so we need to offload work to a background
      * thread.
@@ -41,11 +48,11 @@ public class SunshineFirebaseJobService extends JobService {
     @Override
     public boolean onStartJob(final JobParameters jobParameters) {
 
-        mFetchWeatherTask = new AsyncTask<Void, Void, Void>(){
+        mFetchWeatherTask = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
                 Context context = getApplicationContext();
-                SunshineSyncTask.syncWeather(context);
+                SunshineSyncTask.syncWeather(context, googleClient);
                 jobFinished(jobParameters, false);
                 return null;
             }
@@ -74,5 +81,28 @@ public class SunshineFirebaseJobService extends JobService {
             mFetchWeatherTask.cancel(true);
         }
         return true;
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        googleClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(Wearable.API).build();
+        googleClient.connect();
+
     }
 }
